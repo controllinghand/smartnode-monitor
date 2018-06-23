@@ -2,8 +2,9 @@
 # snmon.sh
 # This script checks the health of all of your smartnode VPS
 
-# As for 2/28/2018 the Protocol version should be 90025
-CURPROTOCOLVER='90025'
+# As of 2/28/2018 the Protocol version should be 90025
+# As of 6/22/2018 the Protocol version should be 90026
+CURPROTOCOLVER='90026'
 
 #Set colors for easy reading. Unless your are color blind sorry for that
 RED='\033[0;31m'
@@ -178,7 +179,7 @@ else
     fi
 fi
 
-# Check smartcashd protocol version 
+# Check smartcashd protocol version (Row 6)
 smartcashdversion=$(echo "$DATA" | grep smartcashdversion | awk -F':' '{print $2}')
 if [[ $smartcashdversion != "$CURPROTOCOLVER" ]];then
     echo -en "[${RED}FAILED${NC}] $smartcashdversion should be at $CURPROTOCOLVER"
