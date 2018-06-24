@@ -155,7 +155,7 @@ smartnodestatus=$(echo "$DATA" | grep smartnodestatus | awk -F':' '{print $2}')
 juststatus=$(echo $smartnodestatus | awk '{print $2}')
 if [[  "$juststatus" != "successfully" ]]
 then
-    echo -en "[${RED}FAILED${NC}]smartcashd is not running"
+    echo -en "[${RED}FAILED${NC}]smartcash nodestatus is $juststatus"
     echo ""
     FFLAG="true"
 else
