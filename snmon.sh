@@ -104,6 +104,7 @@ then
     echo -en "[${RED}FAILED${NC}]No Data Found check monitoring agent on VPS"
     echo ""
     rm -f ssh.err
+    FFLAG="true"
     continue 
 fi
 
@@ -115,6 +116,7 @@ if [[ $DIFF -gt 72000 ]]
 then
     echo -en "[${RED}FAILED${NC}]Data is older than 20mins check VPS"
     echo ""
+    FFLAG="true"
     continue
 fi
 
@@ -124,11 +126,14 @@ if [[ ! $hostname ]]
 then
     echo -en "[${RED}FAILED${NC}]no hostname found"
     echo ""
+    FFLAG="true"
     continue
 fi
 if [[ $VFLAG ]];then 
     echo -en "[${GRN}OK${NC}]hostname: ${BLU}$hostname${NC}"
     echo ""
+else
+    echo -en "${BLU}$hostname${NC}"
 fi
 
 # Check to see if smartcashd is running and by which user
@@ -137,6 +142,7 @@ if [[ ! $smartcashduser ]]
 then
     echo -en "[${RED}FAILED${NC}]smartcashd is not running"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]smartcashd: ${BLU}$smartcashduser${NC} is running the application"
@@ -151,6 +157,7 @@ if [[  "$juststatus" != "successfully" ]]
 then
     echo -en "[${RED}FAILED${NC}]smartcashd is not running"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]status: ${BLU}$smartnodestatus${NC}"
@@ -184,6 +191,7 @@ smartcashdversion=$(echo "$DATA" | grep smartcashdversion | awk -F':' '{print $2
 if [[ $smartcashdversion != "$CURPROTOCOLVER" ]];then
     echo -en "[${RED}FAILED${NC}] $smartcashdversion should be at $CURPROTOCOLVER"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]smartcashd version: ${BLU}$smartcashdversion${NC}"
@@ -198,6 +206,7 @@ if [[  $disknum -gt 90 ]]
 then
     echo -en "[${RED}FAILED${NC}] $currentdiskspaceused over 90% check VPS for disk space"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]current diskspace used%: ${BLU}$currentdiskspaceused${NC}"
@@ -211,6 +220,7 @@ if [[  "$ufwstatus" != " active" ]]
 then
     echo -en "[${RED}FAILED${NC}]firewall is not active"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]firewall status: ${BLU}$ufwstatus${NC}"
@@ -224,6 +234,7 @@ if [[  "$ufwssh" != "LIMIT" ]]
 then
     echo -en "[${RED}FAILED${NC}]check firewall ssh 22 port settings"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]firewall ssh 22: ${BLU}$ufwssh${NC}"
@@ -237,6 +248,7 @@ if [[  "$ufwscport" != "ALLOW" ]]
 then
     echo -en "[${RED}FAILED${NC}]check firewall smartcashd 9768 port settings"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]firewall smartcashd 9768: ${BLU}$ufwscport${NC}"
@@ -250,6 +262,7 @@ if [[ "$ufwother" != "none" ]]
 then
     echo -en "[${RED}FAILED${NC}]$ufwother is open please close"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]firewall any other open: ${BLU}$ufwother${NC}"
@@ -264,6 +277,7 @@ if [[ ! $makerun ]]
 then
     echo -en "[${RED}FAILED${NC}]makerun cron job missing"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]makerun cronjob: ${BLU}$makerun${NC}"
@@ -277,6 +291,7 @@ if [[ ! $checkdaemon ]]
 then
     echo -en "[${RED}FAILED${NC}]checkdaemon cron job missing"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]checkdaemon cronjob: ${BLU}$checkdaemon${NC}"
@@ -290,6 +305,7 @@ if [[ ! $upgrade ]]
 then
     echo -en "[${RED}FAILED${NC}]upgrade cron job missing"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]upgrade cronjob: ${BLU}$upgrade${NC}"
@@ -303,6 +319,7 @@ if [[ ! $clearlog ]]
 then
     echo -en "[${RED}FAILED${NC}]clearlog cron job missing"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]clearlog cronjob: ${BLU}$clearlog${NC}"
@@ -316,6 +333,7 @@ if [[ ! $snmonagent ]]
 then
     echo -en "[${RED}FAILED${NC}]snmonagent cron job missing"
     echo ""
+    FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]snmonagent cronjob: ${BLU}$snmonagent${NC}"
@@ -323,9 +341,9 @@ else
     fi
 fi
 
-if [[ ! $VFLAG ]]  || [[ $VPSIP ]] && [[ ! $WFLAG ]]
+if [[ ! $VFLAG ]]  || [[ $VPSIP ]] && [[ ! $WFLAG ]] && [[ ! $FFLAG ]]
 then
-    echo -en "[${GRN}OK${NC}]${BLU}$hostname${NC}"
+    echo -en "[${GRN}OK${NC}]"
 else
     if [[ $VFLAG ]]
     then
@@ -334,6 +352,7 @@ else
 fi
 
 WFLAG=""
+FFLAG=""
 
 done
 
