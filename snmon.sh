@@ -202,7 +202,7 @@ else
 fi
 
 # Check smartcashd protocol version (Row 8)
-smartcashdversion=$(echo "$DATA" | grep smartcashdprotocolversion | awk -F':' '{print $2}')
+smartcashdprotocolversion=$(echo "$DATA" | grep smartcashdprotocolversion | awk -F':' '{print $2}')
 if [[ $smartcashdprotocolversion != "$CURPROTOCOLVER" ]];then
     echo -en "[${RED}FAILED${NC}] $smartcashdprotocolversion should be at $CURPROTOCOLVER"
     echo ""
