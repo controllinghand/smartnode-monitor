@@ -4,6 +4,8 @@
 
 # As of 2/28/2018 the Protocol version should be 90025
 # As of 6/22/2018 the Protocol version should be 90026
+# AS of 6/24/2018 the software version should be 1020200 i.e. v1.2.2
+CURSOFTWAREVER='1020200'
 CURPROTOCOLVER='90026'
 
 #Set colors for easy reading. Unless your are color blind sorry for that
@@ -95,7 +97,7 @@ do
     echo "SmartNode Check for IP:$output"
 
 #
-# Get data from VPS 
+# Get data from VPS (Row 1)
 #
 DATA=$(ssh -n smartadmin@$output 2>ssh.err cat /home/smartadmin/snmon/snmon.dat)
 
@@ -120,7 +122,7 @@ then
     continue
 fi
 
-# Print out hostname
+# Print out hostname (Row 2)
 hostname=$(echo "$DATA" | grep hostname | awk -F':' '{print $2}')
 if [[ ! $hostname ]]
 then
@@ -136,7 +138,7 @@ else
     echo -en "${BLU}$hostname${NC}"
 fi
 
-# Check to see if smartcashd is running and by which user
+# Check to see if smartcashd is running and by which user (Row 3)
 smartcashduser=$(echo "$DATA" | grep smartcashduser | awk -F':' '{print $2}')
 if [[ ! $smartcashduser ]]
 then
@@ -150,7 +152,7 @@ else
     fi
 fi
 
-# Check smartnode status
+# Check smartnode status (Row 4)
 smartnodestatus=$(echo "$DATA" | grep smartnodestatus | awk -F':' '{print $2}')
 juststatus=$(echo $smartnodestatus | awk '{print $2}')
 if [[  "$juststatus" != "successfully" ]]
@@ -165,14 +167,14 @@ else
     fi
 fi
 
-# Check OS version 
+# Check OS version (Row 5)
 osversion=$(echo "$DATA" | grep osversion | awk -F':' '{print $2}')
 if [[ $VFLAG ]];then 
     echo -en "[${GRN}OK${NC}]OS: ${BLU}$osversion${NC}"
     echo ""
 fi
 
-# Check for OS packages are available for update
+# Check for OS packages are available for update (Row 6)
 ospackagesneedupdate=$(echo "$DATA" | grep ospackagesneedupdate | awk -F':' '{print $2}')
 
 if [[ $ospackagesneedupdate -gt 0 ]]; then
@@ -186,15 +188,28 @@ else
     fi
 fi
 
-# Check smartcashd protocol version (Row 6)
+# Check smartcashd software version (Row 7)
 smartcashdversion=$(echo "$DATA" | grep smartcashdversion | awk -F':' '{print $2}')
-if [[ $smartcashdversion != "$CURPROTOCOLVER" ]];then
-    echo -en "[${RED}FAILED${NC}] $smartcashdversion should be at $CURPROTOCOLVER"
+if [[ $smartcashdversion != "$CURSOFTWAREVER" ]];then
+    echo -en "[${RED}FAILED${NC}] $smartcashdversion should be at $CURSOFTWAREVER"
     echo ""
     FFLAG="true"
 else
     if [[ $VFLAG ]];then 
         echo -en "[${GRN}OK${NC}]smartcashd version: ${BLU}$smartcashdversion${NC}"
+        echo ""
+    fi
+fi
+
+# Check smartcashd protocol version (Row 8)
+smartcashdversion=$(echo "$DATA" | grep smartcashdprotocolversion | awk -F':' '{print $2}')
+if [[ $smartcashdprotocolversion != "$CURPROTOCOLVER" ]];then
+    echo -en "[${RED}FAILED${NC}] $smartcashdprotocolversion should be at $CURPROTOCOLVER"
+    echo ""
+    FFLAG="true"
+else
+    if [[ $VFLAG ]];then 
+        echo -en "[${GRN}OK${NC}]smartcashd protocol version: ${BLU}$smartcashdprotocolversion${NC}"
         echo ""
     fi
 fi
