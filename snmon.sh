@@ -6,7 +6,8 @@
 # As of 6/22/2018 the Protocol version should be 90026
 # AS of 6/24/2018 the software version should be 1020200 i.e. v1.2.2
 # AS of 6/28/2018 the software version should be 1020300 i.e. v1.2.3
-CURSOFTWAREVER='1020400'
+# AS of 9/4/2018 the software version should be 1020500 i.e. v1.2.5
+CURSOFTWAREVER='1020500'
 CURPROTOCOLVER='90026'
 
 #Set colors for easy reading. Unless your are color blind sorry for that
